@@ -2,26 +2,29 @@
 
 int main()
 {
+  pozdnyakov::Database db;
 
-  std::vector< std::string > db;
-
-  using cmd_t = void (*)(std::istream &, std::ostream &, std::vector< std::string > &);
-  std::unordered_map< std::string, cmd_t > cmds;
-  cmds["add"] = add_string;
-  cmds["show-last"] = show_last;
-  cmds["hello"] = hi;
-  cmds["noop"] = noop;
+  using cmd_t = void (*)(std::istream &, std::ostream &, pozdnyakov::Database &);
+  std::unordered_map< std::string, cmd_t > cmds = {}
 
   std::string cmd;
   while (std::cin >> cmd) {
     try {
-      cmds.at(cmd)(std::cin, std::cout, db);
+      auto it = cmds.find(cmd);
+      if (it == cmds.end()) {
+        throw std::out_of_range("unknown command");
+      }
+      it->second(std::cin, std::cout, db);
     } catch (const std::out_of_range &) {
       std::cout << "<INVALID COMMAND>\n";
-      auto toignore = std::numeric_limits< std::streamsize >::max();
-      std::cin.ignore(toignore, '\n');
-    } catch (const std::logic_error &e) {
-      std::cout << "<INVALID COMMAND: " << e.what() << ">\n";
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+    } catch (const std::logic_error &) {
+      std::cout << "<INVALID COMMAND>\n";
+      if (std::cin.fail()) {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits< std::streamsize >::max(), '\n');
+      }
     }
   }
 
