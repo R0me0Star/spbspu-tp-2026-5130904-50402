@@ -55,8 +55,13 @@ namespace pozdnyakov
     if (it == db.end()) {
       throw std::logic_error("note not found");
     }
-    for (const auto &line : it->second->lines) {
-      out << line << "\n";
+
+    if (it->second->lines.empty()) {
+      out << "\n";
+    } else {
+      for (const auto &line : it->second->lines) {
+        out << line << "\n";
+      }
     }
   }
 
@@ -102,10 +107,16 @@ namespace pozdnyakov
       throw std::logic_error("note not found");
     }
 
+    bool printed = false;
     for (const auto &w : it_from->second->links) {
       if (auto p = w.lock()) {
         out << p->name << "\n";
+        printed = true;
       }
+    }
+
+    if (!printed) {
+      out << "\n";
     }
   }
 
@@ -162,10 +173,10 @@ namespace pozdnyakov
 
     auto &lnks = it->second->links;
     lnks.erase(std::remove_if(lnks.begin(), lnks.end(),
-                              [](const std::weak_ptr< Note > &w) {
-                                return w.expired();
-                              }),
-               lnks.end());
+      [](const std::weak_ptr< Note > &w) {
+        return w.expired();
+      }),
+      lnks.end());
   }
 
 }
