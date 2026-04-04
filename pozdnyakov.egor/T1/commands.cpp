@@ -26,7 +26,7 @@ namespace pozdnyakov
     return s;
   }
 
-  void cmdNote(std::istream &in, std::ostream &out, Database &db)
+  void cmdNote(std::istream &in, std::ostream &, Database &db)
   {
     auto name = readWord(in);
     if (db.count(name)) {
@@ -35,7 +35,7 @@ namespace pozdnyakov
     db[name] = std::make_shared< Note >(name);
   }
 
-  void cmdLine(std::istream &in, std::ostream &out, Database &db)
+  void cmdLine(std::istream &in, std::ostream &, Database &db)
   {
     auto name = readWord(in);
     auto text = readQuoted(in);
@@ -60,7 +60,7 @@ namespace pozdnyakov
     }
   }
 
-  void cmdDrop(std::istream &in, std::ostream &out, Database &db)
+  void cmdDrop(std::istream &in, std::ostream &, Database &db)
   {
     auto name = readWord(in);
 
@@ -71,7 +71,7 @@ namespace pozdnyakov
     db.erase(it);
   }
 
-  void cmdLink(std::istream &in, std::ostream &out, Database &db)
+  void cmdLink(std::istream &in, std::ostream &, Database &db)
   {
     auto from = readWord(in);
     auto to = readWord(in);
@@ -109,7 +109,7 @@ namespace pozdnyakov
     }
   }
 
-  void cmdHalt(std::istream &in, std::ostream &out, Database &db)
+  void cmdHalt(std::istream &in, std::ostream &, Database &db)
   {
     auto from = readWord(in);
     auto to = readWord(in);
@@ -151,7 +151,7 @@ namespace pozdnyakov
     out << count << "\n";
   }
 
-  void cmdRefresh(std::istream &in, std::ostream &out, Database &db)
+  void cmdRefresh(std::istream &in, std::ostream &, Database &db)
   {
     auto from = readWord(in);
 
@@ -162,9 +162,10 @@ namespace pozdnyakov
 
     auto &lnks = it->second->links;
     lnks.erase(std::remove_if(lnks.begin(), lnks.end(),
-      [](const std::weak_ptr< Note > &w) {
-        return w.expired();
-      }), lnks.end());
+                              [](const std::weak_ptr< Note > &w) {
+                                return w.expired();
+                              }),
+               lnks.end());
   }
 
 }
